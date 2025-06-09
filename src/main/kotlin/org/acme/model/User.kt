@@ -1,14 +1,13 @@
-
-
 package org.acme.model
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.persistence.*
-import java.io.Serializable
-import com.fasterxml.jackson.annotation.*
+
 @Entity
 @Table(name = "Users")
 data class User(
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
 
     var name: String = "",
@@ -16,7 +15,8 @@ data class User(
     var email: String = "",
 
     var age: Int = 0,
-    @OneToMany(mappedBy = "user")
-    var orders: MutableList<Order> = mutableListOf()
 
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
+    @JsonIgnore
+    var orders: MutableList<Order> = mutableListOf()
 )

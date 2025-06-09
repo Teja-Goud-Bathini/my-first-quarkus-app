@@ -1,4 +1,5 @@
 package org.acme.resource
+import jakarta.ws.rs.core.Response
 
 import jakarta.transaction.Transactional
 import jakarta.ws.rs.*
@@ -29,29 +30,50 @@ class OrderResource(
     @Path("/{id}")
     fun getById(@PathParam("id") id: Long): Order? = orderRepository.findById(id)
 
-    @POST
-    @Transactional
-    fun createOrder(orderRequest: OrderRequest): Order {
-        val user = userRepository.findById(orderRequest.userId)
-            ?: throw NotFoundException("User not found with id ${orderRequest.userId}")
+//    @POST
+//    @Transactional
+//    fun createOrder(orderRequest: OrderRequest): Order {
+//        val user = userRepository.findById(orderRequest.userId)
+//            ?: throw NotFoundException("User not found with id ${orderRequest.userId}")
+//
+//        val products = orderRequest.productIds.map { productId ->
+//            productRepository.findById(productId)
+//                ?: throw NotFoundException("Product not found with id $productId")
+//        }
+//
+//       val orderDate = orderRequest.orderDate.toString()
+//
+//
+//        val order = Order(
+//            orderDate = orderDate,
+//            user = user,
+//            products = products.toMutableList()
+//        )
+//
+//        orderRepository.persist(order)
+//        return order
+//    }
+@POST
+@Transactional
+fun createOrder(orderRequest: OrderRequest): Response {
+    val user = userRepository.findById(orderRequest.userId)
+        ?: throw NotFoundException("User not found with id ${orderRequest.userId}")
 
-        val products = orderRequest.productIds.map { productId ->
-            productRepository.findById(productId)
-                ?: throw NotFoundException("Product not found with id $productId")
-        }
-
-       val orderDate = orderRequest.orderDate.toString()
-
-
-        val order = Order(
-            orderDate = orderDate,
-            user = user,
-            products = products.toMutableList()
-        )
-
-        orderRepository.persist(order)
-        return order
+    val products = orderRequest.productIds.map { productId ->
+        productRepository.findById(productId)
+            ?: throw NotFoundException("Product not found with id $productId")
     }
+
+    val order = Order(
+        orderDate = orderRequest.orderDate,
+        user = user,
+        products = products.toMutableList()
+    )
+
+    orderRepository.persist(order)
+
+    return Response.status(Response.Status.CREATED).entity(order).build()
+}
 
     @DELETE
     @Path("/{id}")

@@ -1,7 +1,6 @@
-
-
 package org.acme.model
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.persistence.*
 import java.io.Serializable
 
@@ -19,5 +18,6 @@ data class Product(
     var price: Double = 0.0,
 
     @ManyToMany(mappedBy = "products")
+    @JsonIgnore // 🔥 Important: Prevents infinite recursion and lazy loading issues
     var orders: MutableList<Order> = mutableListOf()
 ) : Serializable
