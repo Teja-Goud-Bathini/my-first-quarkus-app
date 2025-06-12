@@ -19,6 +19,7 @@ class UserResource(private val userRepository: UserRepository) {
 
 
 
+
     @GET
     @Path("/{id}")
     fun getById(@PathParam("id") id: Long): User? = userRepository.findById(id)

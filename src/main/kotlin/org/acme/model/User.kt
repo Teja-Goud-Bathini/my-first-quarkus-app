@@ -18,5 +18,9 @@ data class User(
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
     @JsonIgnore
-    var orders: MutableList<Order> = mutableListOf()
+    var orders: MutableList<Order> = mutableListOf(),
+
+    @OneToOne(mappedBy = "user", cascade = [CascadeType.ALL])
+    @JsonIgnore
+    var cart: Cart? = null
 )

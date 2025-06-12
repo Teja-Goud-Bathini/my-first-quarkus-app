@@ -1,6 +1,4 @@
-package org.acme.model
-
-
+package org.acme.dto
 data class OrderRequest(
     val userId: Long,
     val productIds: List<Long>,
