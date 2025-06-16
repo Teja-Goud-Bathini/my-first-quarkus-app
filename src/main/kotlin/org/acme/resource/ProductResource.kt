@@ -28,9 +28,11 @@ class ProductResource(
         @QueryParam("category") category: String?,
         @QueryParam("brand") brand: String?,
         @QueryParam("ageGroup") ageGroup: String?,
-        @QueryParam("name") name: String?
+        @QueryParam("name") name: String?,
+        @QueryParam("priceMin") priceMin: Double?,
+    @QueryParam("priceMax") priceMax: Double?
     ): Response {
-        val products = productRepo.findByFilterNames(gender, category, brand, ageGroup, name)
+        val products = productRepo.findByFilterNames(gender, category, brand, ageGroup, name,priceMin,priceMax)
         return Response.ok(products).build()
     }
     @GET
@@ -42,9 +44,11 @@ class ProductResource(
         @QueryParam("genderId") genderId: Long?,
         @QueryParam("categoryId") categoryId: Long?,
         @QueryParam("brandId") brandId: Long?,
-        @QueryParam("ageGroupId") ageGroupId: Long?
+        @QueryParam("ageGroupId") ageGroupId: Long?,
+        @QueryParam("priceMin") priceMin: Double?,
+    @QueryParam("priceMax") priceMax: Double?
     ): Response {
-        val products = productRepo.findByFilters(genderId, categoryId, brandId, ageGroupId)
+        val products = productRepo.findByFilters(genderId, categoryId, brandId, ageGroupId,priceMin,priceMax)
         return Response.ok(products).build()
     }
 
@@ -59,6 +63,7 @@ class ProductResource(
             ?: throw NotFoundException("Category not found with id ${productRequest.categoryId}")
         val brand = brandRepo.findById(productRequest.brandId)
             ?: throw NotFoundException("Brand not found with id ${productRequest.brandId}")
+
 
         val product = Product(
             name = productRequest.name,

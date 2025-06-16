@@ -16,7 +16,9 @@ class ProductRepository : PanacheRepository<Product> {
         genderId: Long?,
         categoryId: Long?,
         brandId: Long?,
-        ageGroupId: Long?
+        ageGroupId: Long?,
+        priceMin: Double?,
+        priceMax: Double?
     ): List<Product> {
         val baseQuery = StringBuilder("""
         SELECT p FROM Product p
@@ -31,6 +33,8 @@ class ProductRepository : PanacheRepository<Product> {
         if (categoryId != null) baseQuery.append(" AND p.category.id = :categoryId")
         if (brandId != null) baseQuery.append(" AND p.brand.id = :brandId")
         if (ageGroupId != null) baseQuery.append(" AND p.ageGroup.id = :ageGroupId")
+        if (priceMin != null) baseQuery.append(" AND p.price >= :priceMin")
+        if (priceMax != null) baseQuery.append(" AND p.price <= :priceMax")
 
         val query = em.createQuery(baseQuery.toString(), Product::class.java)
 
@@ -38,7 +42,8 @@ class ProductRepository : PanacheRepository<Product> {
         categoryId?.let { query.setParameter("categoryId", it) }
         brandId?.let { query.setParameter("brandId", it) }
         ageGroupId?.let { query.setParameter("ageGroupId", it) }
-
+        priceMin?.let { query.setParameter("priceMin", it) }
+        priceMax?.let { query.setParameter("priceMax", it) }
         return query.resultList
     }
 
@@ -47,7 +52,9 @@ class ProductRepository : PanacheRepository<Product> {
         category: String?,
         brand: String?,
         ageGroup: String?,
-        name: String?
+        name: String?,
+        priceMin:Double?,
+        priceMax:Double?,
     ): List<Product> {
         val query = StringBuilder("""
         SELECT p FROM Product p
@@ -80,7 +87,14 @@ class ProductRepository : PanacheRepository<Product> {
             query.append(" AND LOWER(p.name) LIKE LOWER(:name)")
             params["name"] = "%$it%"
         }
-
+        priceMin?.let {
+            query.append(" AND p.price >= :priceMin") // Fixed here
+            params["priceMin"] = it
+        }
+        priceMax?.let {
+            query.append(" AND p.price <= :priceMax") // Fixed here
+            params["priceMax"] = it
+        }
         val jpaQuery = em.createQuery(query.toString(), Product::class.java)
         params.forEach { (key, value) -> jpaQuery.setParameter(key, value) }
 
