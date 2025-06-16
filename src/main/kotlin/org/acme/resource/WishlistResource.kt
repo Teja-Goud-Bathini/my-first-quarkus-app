@@ -60,3 +60,4 @@ class WishlistResource(
         return wishlistRepository.deleteById(id)
     }
 }
+

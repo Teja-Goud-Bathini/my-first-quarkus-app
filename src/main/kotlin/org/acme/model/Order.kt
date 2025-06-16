@@ -12,6 +12,8 @@ data class Order(
 
     var orderDate: String = "",
 
+    @Column(nullable = false)
+    var totalPrice: Double = 0.0,
     @ManyToOne
     @JoinColumn(name = "user_id")
     var user: User? = null,

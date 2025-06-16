@@ -21,6 +21,10 @@ dependencies {
     implementation 'io.quarkus:quarkus-hibernate-orm-panache-kotlin'
     implementation("io.quarkus:quarkus-resteasy-reactive-jackson")
 
+    implementation 'io.quarkus:quarkus-security' // ✅ Core security
+    implementation 'io.quarkus:quarkus-elytron-security-properties-file' // ✅ For in-memory admin login
+
+
 
 
     testImplementation 'io.quarkus:quarkus-junit5'

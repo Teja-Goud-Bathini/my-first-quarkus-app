@@ -3,12 +3,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.persistence.*
 @Entity
 @Table(name = "Genders")
-data class  Gender(
+data class Gender(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
 
-    var label: String = "", // e.g., "Men", "Women", "Unisex"
+    var name: String = "", // e.g., "Men", "Women", "Unisex"
 
     @OneToMany(mappedBy = "gender", fetch = FetchType.LAZY)
     @JsonIgnore

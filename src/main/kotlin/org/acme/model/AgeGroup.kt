@@ -10,7 +10,7 @@ data class AgeGroup(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
 
-    var label: String = "", // e.g., "Kids", "Teens", "Adults"
+    var name: String = "", // e.g., "Kids", "Teens", "Adults"
 
     @OneToMany(mappedBy = "ageGroup", fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
     @JsonIgnore

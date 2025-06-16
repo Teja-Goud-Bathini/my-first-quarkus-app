@@ -12,3 +12,5 @@ class GreetingResource {
     @Produces(MediaType.TEXT_PLAIN)
     fun hello() = "Hi from Quarkus REST"
 }
+
+
