@@ -21,6 +21,13 @@ class ProductResource(
 
     @GET
     fun getAll(): List<Product> = productRepo.listAll()
+
+    //Get By Id
+    @GET
+    @Path("/{id}")
+    fun getById(@PathParam("id") id: Long): Product? = productRepo.findById(id)
+
+    //Search
     @GET
     @Path("/search") // Add this line to avoid conflict
     fun queryProducts(
@@ -30,14 +37,13 @@ class ProductResource(
         @QueryParam("ageGroup") ageGroup: String?,
         @QueryParam("name") name: String?,
         @QueryParam("priceMin") priceMin: Double?,
-    @QueryParam("priceMax") priceMax: Double?
+    @QueryParam("priceMax") priceMax: Double?,
+        @QueryParam("sort")sort:String?
     ): Response {
-        val products = productRepo.findByFilterNames(gender, category, brand, ageGroup, name,priceMin,priceMax)
+        val products = productRepo.findByFilterNames(gender, category, brand, ageGroup, name,priceMin,priceMax,sort)
         return Response.ok(products).build()
     }
-    @GET
-    @Path("/{id}")
-    fun getById(@PathParam("id") id: Long): Product? = productRepo.findById(id)
+
     @GET
     @Path("/filter")
     fun filterProducts(
@@ -46,9 +52,10 @@ class ProductResource(
         @QueryParam("brandId") brandId: Long?,
         @QueryParam("ageGroupId") ageGroupId: Long?,
         @QueryParam("priceMin") priceMin: Double?,
-    @QueryParam("priceMax") priceMax: Double?
+        @QueryParam("priceMax") priceMax: Double?,
+        @QueryParam("sort")sort:String?
     ): Response {
-        val products = productRepo.findByFilters(genderId, categoryId, brandId, ageGroupId,priceMin,priceMax)
+        val products = productRepo.findByFilters(genderId, categoryId, brandId, ageGroupId,priceMin,priceMax,sort)
         return Response.ok(products).build()
     }
 

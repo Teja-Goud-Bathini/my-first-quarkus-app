@@ -2,9 +2,9 @@ package org.acme.repository
 
 import io.quarkus.hibernate.orm.panache.kotlin.PanacheRepository
 import jakarta.enterprise.context.ApplicationScoped
-import org.acme.model.Product
 import jakarta.persistence.EntityManager
 import jakarta.persistence.PersistenceContext
+import org.acme.model.Product
 
 @ApplicationScoped
 class ProductRepository : PanacheRepository<Product> {
@@ -18,16 +18,17 @@ class ProductRepository : PanacheRepository<Product> {
         brandId: Long?,
         ageGroupId: Long?,
         priceMin: Double?,
-        priceMax: Double?
+        priceMax: Double?,
+        sort: String?
     ): List<Product> {
         val baseQuery = StringBuilder("""
-        SELECT p FROM Product p
-        LEFT JOIN FETCH p.gender
-        LEFT JOIN FETCH p.category
-        LEFT JOIN FETCH p.brand
-        LEFT JOIN FETCH p.ageGroup
-        WHERE 1=1
-    """.trimIndent())
+            SELECT p FROM Product p
+            LEFT JOIN FETCH p.gender
+            LEFT JOIN FETCH p.category
+            LEFT JOIN FETCH p.brand
+            LEFT JOIN FETCH p.ageGroup
+            WHERE 1=1
+        """.trimIndent())
 
         if (genderId != null) baseQuery.append(" AND p.gender.id = :genderId")
         if (categoryId != null) baseQuery.append(" AND p.category.id = :categoryId")
@@ -35,6 +36,11 @@ class ProductRepository : PanacheRepository<Product> {
         if (ageGroupId != null) baseQuery.append(" AND p.ageGroup.id = :ageGroupId")
         if (priceMin != null) baseQuery.append(" AND p.price >= :priceMin")
         if (priceMax != null) baseQuery.append(" AND p.price <= :priceMax")
+
+        sort?.lowercase()?.let {
+            if (it == "asc") baseQuery.append(" ORDER BY p.price ASC")
+            else if (it == "desc") baseQuery.append(" ORDER BY p.price DESC")
+        }
 
         val query = em.createQuery(baseQuery.toString(), Product::class.java)
 
@@ -44,6 +50,7 @@ class ProductRepository : PanacheRepository<Product> {
         ageGroupId?.let { query.setParameter("ageGroupId", it) }
         priceMin?.let { query.setParameter("priceMin", it) }
         priceMax?.let { query.setParameter("priceMax", it) }
+
         return query.resultList
     }
 
@@ -53,17 +60,18 @@ class ProductRepository : PanacheRepository<Product> {
         brand: String?,
         ageGroup: String?,
         name: String?,
-        priceMin:Double?,
-        priceMax:Double?,
+        priceMin: Double?,
+        priceMax: Double?,
+        sort: String?
     ): List<Product> {
         val query = StringBuilder("""
-        SELECT p FROM Product p
-        LEFT JOIN FETCH p.gender
-        LEFT JOIN FETCH p.category
-        LEFT JOIN FETCH p.brand
-        LEFT JOIN FETCH p.ageGroup
-        WHERE 1=1
-    """.trimIndent())
+            SELECT p FROM Product p
+            LEFT JOIN FETCH p.gender
+            LEFT JOIN FETCH p.category
+            LEFT JOIN FETCH p.brand
+            LEFT JOIN FETCH p.ageGroup
+            WHERE 1=1
+        """.trimIndent())
 
         val params = mutableMapOf<String, Any>()
 
@@ -88,18 +96,22 @@ class ProductRepository : PanacheRepository<Product> {
             params["name"] = "%$it%"
         }
         priceMin?.let {
-            query.append(" AND p.price >= :priceMin") // Fixed here
+            query.append(" AND p.price >= :priceMin")
             params["priceMin"] = it
         }
         priceMax?.let {
-            query.append(" AND p.price <= :priceMax") // Fixed here
+            query.append(" AND p.price <= :priceMax")
             params["priceMax"] = it
         }
+
+        sort?.lowercase()?.let {
+            if (it == "asc") query.append(" ORDER BY p.price ASC")
+            else if (it == "desc") query.append(" ORDER BY p.price DESC")
+        }
+
         val jpaQuery = em.createQuery(query.toString(), Product::class.java)
         params.forEach { (key, value) -> jpaQuery.setParameter(key, value) }
 
         return jpaQuery.resultList
     }
-
-
 }
