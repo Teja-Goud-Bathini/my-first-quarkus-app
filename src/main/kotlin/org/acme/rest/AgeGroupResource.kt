@@ -1,51 +1,47 @@
-package org.acme.resource
+package org.acme.rest
 
-import jakarta.transaction.Transactional
 import jakarta.ws.rs.*
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
 import org.acme.model.AgeGroup
-import org.acme.repository.AgeGroupRepository
+import org.acme.service.AgeGroupService
 
 @Path("/age-groups")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-class AgeGroupResource(private val ageGroupRepo: AgeGroupRepository) {
+class AgeGroupResource(private val ageGroupService: AgeGroupService) {
 
     @GET
-    fun list(): List<AgeGroup> = ageGroupRepo.listAll()
+    fun list(): List<AgeGroup> = ageGroupService.listAll()
 
     @GET
     @Path("/{id}")
     fun getById(@PathParam("id") id: Long): Response {
-        val ageGroup = ageGroupRepo.findById(id)
+        val ageGroup = ageGroupService.findById(id)
             ?: return Response.status(Response.Status.NOT_FOUND).build()
         return Response.ok(ageGroup).build()
     }
 
     @POST
-    @Transactional
     fun add(ageGroup: AgeGroup): Response {
-        ageGroupRepo.persist(ageGroup)
-        return Response.status(Response.Status.CREATED).entity(ageGroup).build()
+        val created = ageGroupService.add(ageGroup)
+        return Response.status(Response.Status.CREATED).entity(created).build()
     }
 
     @PUT
     @Path("/{id}")
-    @Transactional
     fun update(@PathParam("id") id: Long, updated: AgeGroup): Response {
-        val existing = ageGroupRepo.findById(id)
+        val existing = ageGroupService.update(id, updated)
             ?: return Response.status(Response.Status.NOT_FOUND).build()
-        existing.name = updated.name
         return Response.ok(existing).build()
     }
 
     @DELETE
     @Path("/{id}")
-    @Transactional
     fun delete(@PathParam("id") id: Long): Response {
-        val deleted = ageGroupRepo.deleteById(id)
-        return if (deleted) Response.noContent().build()
-        else Response.status(Response.Status.NOT_FOUND).build()
+        return if (ageGroupService.delete(id))
+            Response.noContent().build()
+        else
+            Response.status(Response.Status.NOT_FOUND).build()
     }
 }
